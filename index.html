@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/MarkerCluster.css">
+        <link rel="stylesheet" href="css/MarkerCluster.Default.css">
+        <link rel="stylesheet" href="css/leaflet-search.css">
+        <link rel="stylesheet" href="css/filter.css">
+<link rel="stylesheet" href="css/nouislider.min.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/leaflet-svg-shape-markers.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="js/leaflet.markercluster.js"></script>
+        <script src="js/leaflet-search.js"></script>
+        <script src="js/tailDT.js"></script>
+<script src="js/nouislider.min.js"></script>
+<script src="js/wNumb.js"></script>
+        <script src="data/GRANDESZONAS_3.js"></script>
+        <script src="data/LIMITEDISTRITAL_4.js"></script>
+        <script src="data/CENTROSPOBLADOS_5.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                color: '#ffff00',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#ffff00',
+                fillOpacity: 1
+              });
+            }
+            highlightLayer.openPopup();
+        }
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        })
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+            if (bounds_group.getLayers().length) {
+                map.fitBounds(bounds_group.getBounds());
+            }
+        }
+        var layer_OpenStreetMap_0 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
+        });
+        layer_OpenStreetMap_0;
+        map.addLayer(layer_OpenStreetMap_0);
+        var layer_GoogleMaps_1 = L.tileLayer('https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}', {
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 18
+        });
+        layer_GoogleMaps_1;
+        map.addLayer(layer_GoogleMaps_1);
+        var layer_GoogleSatellite_2 = L.tileLayer('http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}', {
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 18
+        });
+        layer_GoogleSatellite_2;
+        map.addLayer(layer_GoogleSatellite_2);
+        function pop_GRANDESZONAS_3(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2"><strong>ZEECODE</strong><br />' + (feature.properties['ZEECODE'] !== null ? Autolinker.link(feature.properties['ZEECODE'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>ZONAS_GRAN</strong><br />' + (feature.properties['ZONAS_GRAN'] !== null ? Autolinker.link(feature.properties['ZONAS_GRAN'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>ZONAS</strong><br />' + (feature.properties['ZONAS'] !== null ? Autolinker.link(feature.properties['ZONAS'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>ZEE</strong><br />' + (feature.properties['ZEE'] !== null ? Autolinker.link(feature.properties['ZEE'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Hectares</strong><br />' + (feature.properties['Hectares'] !== null ? Autolinker.link(feature.properties['Hectares'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_GRANDESZONAS_3_0(feature) {
+            switch(String(feature.properties['ZONAS_GRAN'])) {
+                case 'Zona de protección y conservación ecológica':
+                    return {
+                pane: 'pane_GRANDESZONAS_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(152,210,118,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona para recuperación':
+                    return {
+                pane: 'pane_GRANDESZONAS_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(227,26,28,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona productiva':
+                    return {
+                pane: 'pane_GRANDESZONAS_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,127,0,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona urbana e industrial':
+                    return {
+                pane: 'pane_GRANDESZONAS_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,0,0,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_GRANDESZONAS_3');
+        map.getPane('pane_GRANDESZONAS_3').style.zIndex = 403;
+        map.getPane('pane_GRANDESZONAS_3').style['mix-blend-mode'] = 'normal';
+        var layer_GRANDESZONAS_3 = new L.geoJson(json_GRANDESZONAS_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_GRANDESZONAS_3',
+            layerName: 'layer_GRANDESZONAS_3',
+            pane: 'pane_GRANDESZONAS_3',
+            onEachFeature: pop_GRANDESZONAS_3,
+            style: style_GRANDESZONAS_3_0,
+        });
+        bounds_group.addLayer(layer_GRANDESZONAS_3);
+        map.addLayer(layer_GRANDESZONAS_3);
+        function pop_LIMITEDISTRITAL_4(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AREA'] !== null ? Autolinker.link(feature.properties['AREA'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['PERIMETER'] !== null ? Autolinker.link(feature.properties['PERIMETER'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LIM_DPTO_'] !== null ? Autolinker.link(feature.properties['LIM_DPTO_'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LIM_DPTO_I'] !== null ? Autolinker.link(feature.properties['LIM_DPTO_I'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['PROVINCIA'] !== null ? Autolinker.link(feature.properties['PROVINCIA'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DISTRITO'] !== null ? Autolinker.link(feature.properties['DISTRITO'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CAPITAL'] !== null ? Autolinker.link(feature.properties['CAPITAL'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CATEGORIA_'] !== null ? Autolinker.link(feature.properties['CATEGORIA_'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CODE'] !== null ? Autolinker.link(feature.properties['CODE'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_LIMITEDISTRITAL_4_0() {
+            return {
+                pane: 'pane_LIMITEDISTRITAL_4',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '10,5',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fillOpacity: 0,
+                interactive: false,
+            }
+        }
+        map.createPane('pane_LIMITEDISTRITAL_4');
+        map.getPane('pane_LIMITEDISTRITAL_4').style.zIndex = 404;
+        map.getPane('pane_LIMITEDISTRITAL_4').style['mix-blend-mode'] = 'normal';
+        var layer_LIMITEDISTRITAL_4 = new L.geoJson(json_LIMITEDISTRITAL_4, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_LIMITEDISTRITAL_4',
+            layerName: 'layer_LIMITEDISTRITAL_4',
+            pane: 'pane_LIMITEDISTRITAL_4',
+            onEachFeature: pop_LIMITEDISTRITAL_4,
+            style: style_LIMITEDISTRITAL_4_0,
+        });
+        bounds_group.addLayer(layer_LIMITEDISTRITAL_4);
+        map.addLayer(layer_LIMITEDISTRITAL_4);
+        function pop_CENTROSPOBLADOS_5(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DISTRITO'] !== null ? Autolinker.link(feature.properties['DISTRITO'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CATEGORIA'] !== null ? Autolinker.link(feature.properties['CATEGORIA'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CCPP'] !== null ? Autolinker.link(feature.properties['CCPP'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TIPO_SALID'] !== null ? Autolinker.link(feature.properties['TIPO_SALID'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SALIDA_A0'] !== null ? Autolinker.link(feature.properties['SALIDA_A0'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['PROVINCIA'] !== null ? Autolinker.link(feature.properties['PROVINCIA'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CAPITALES'] !== null ? Autolinker.link(feature.properties['CAPITALES'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FUENTE'] !== null ? Autolinker.link(feature.properties['FUENTE'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['POBLACION'] !== null ? Autolinker.link(feature.properties['POBLACION'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CUENCA'] !== null ? Autolinker.link(feature.properties['CUENCA'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MARGEN'] !== null ? Autolinker.link(feature.properties['MARGEN'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DATUM'] !== null ? Autolinker.link(feature.properties['DATUM'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CATEG_OT'] !== null ? Autolinker.link(feature.properties['CATEG_OT'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['RESOLUCION'] !== null ? Autolinker.link(feature.properties['RESOLUCION'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FECHA'] !== null ? Autolinker.link(feature.properties['FECHA'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CI_GRUPO'] !== null ? Autolinker.link(feature.properties['CI_GRUPO'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['X_COORD'] !== null ? Autolinker.link(feature.properties['X_COORD'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Y_COORD'] !== null ? Autolinker.link(feature.properties['Y_COORD'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TEXT'] !== null ? Autolinker.link(feature.properties['TEXT'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_CENTROSPOBLADOS_5_0() {
+            return {
+                pane: 'pane_CENTROSPOBLADOS_5',
+                shape: 'square',
+                radius: 6.8,
+                opacity: 1,
+                color: 'rgba(250,250,250,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(40,53,34,1.0)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_CENTROSPOBLADOS_5');
+        map.getPane('pane_CENTROSPOBLADOS_5').style.zIndex = 405;
+        map.getPane('pane_CENTROSPOBLADOS_5').style['mix-blend-mode'] = 'normal';
+        var layer_CENTROSPOBLADOS_5 = new L.geoJson(json_CENTROSPOBLADOS_5, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_CENTROSPOBLADOS_5',
+            layerName: 'layer_CENTROSPOBLADOS_5',
+            pane: 'pane_CENTROSPOBLADOS_5',
+            onEachFeature: pop_CENTROSPOBLADOS_5,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.shapeMarker(latlng, style_CENTROSPOBLADOS_5_0(feature));
+            },
+        });
+        var cluster_CENTROSPOBLADOS_5 = new L.MarkerClusterGroup({showCoverageOnHover: false,
+            spiderfyDistanceMultiplier: 2});
+        cluster_CENTROSPOBLADOS_5.addLayer(layer_CENTROSPOBLADOS_5);
+
+        bounds_group.addLayer(layer_CENTROSPOBLADOS_5);
+        cluster_CENTROSPOBLADOS_5.addTo(map);
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'<img src="legend/CENTROSPOBLADOS_5.png" /> CENTROS POBLADOS': cluster_CENTROSPOBLADOS_5,'<img src="legend/LIMITEDISTRITAL_4.png" /> LIMITE DISTRITAL': layer_LIMITEDISTRITAL_4,'GRANDES ZONAS<br /><table><tr><td style="text-align: center;"><img src="legend/GRANDESZONAS_3_Zonadeprotecciónyconservaciónecológica0.png" /></td><td>Zona de protección y conservación ecológica</td></tr><tr><td style="text-align: center;"><img src="legend/GRANDESZONAS_3_Zonapararecuperación1.png" /></td><td>Zona para recuperación</td></tr><tr><td style="text-align: center;"><img src="legend/GRANDESZONAS_3_Zonaproductiva2.png" /></td><td>Zona productiva</td></tr><tr><td style="text-align: center;"><img src="legend/GRANDESZONAS_3_Zonaurbanaeindustrial3.png" /></td><td>Zona urbana e industrial</td></tr></table>': layer_GRANDESZONAS_3,"Google Satellite": layer_GoogleSatellite_2,"Google Maps": layer_GoogleMaps_1,"OpenStreetMap": layer_OpenStreetMap_0,}).addTo(map);
+        setBounds();
+        var i = 0;
+        layer_LIMITEDISTRITAL_4.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['DISTRITO'] !== null?String('<div style="color: #000000; font-size: 10pt; font-family: \'MS Shell Dlg 2\', sans-serif;">' + layer.feature.properties['DISTRITO']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_LIMITEDISTRITAL_4'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        var i = 0;
+        layer_CENTROSPOBLADOS_5.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['CCPP'] !== null?String('<div style="color: #000000; font-size: 8pt; font-family: \'MS Shell Dlg 2\', sans-serif;">' + layer.feature.properties['CCPP']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_CENTROSPOBLADOS_5'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        map.addControl(new L.Control.Search({
+            layer: cluster_CENTROSPOBLADOS_5,
+            initial: false,
+            hideMarkerOnCollapse: true,
+            propertyName: 'CCPP'}));
+        document.getElementsByClassName('search-button')[0].className +=
+         ' fa fa-binoculars';
+        var mapDiv = document.getElementById('map');
+        var row = document.createElement('div');
+        row.className="row";
+        row.id="all";
+        row.style.height = "100%";
+        var col1 = document.createElement('div');
+        col1.className="col9";
+        col1.id = "mapWindow";
+        col1.style.height = "99%";
+        col1.style.width = "80%";
+        col1.style.display = "inline-block";
+        var col2 = document.createElement('div');
+        col2.className="col3";
+        col2.id = "menu";
+        col2.style.display = "inline-block";
+        mapDiv.parentNode.insertBefore(row, mapDiv);
+        document.getElementById("all").appendChild(col1);
+        document.getElementById("all").appendChild(col2);
+        col1.appendChild(mapDiv)
+        var Filters = {"ZEE": "str","ZONAS_GRAN": "str","ZONAS": "str"};
+        function filterFunc() {
+          map.eachLayer(function(lyr){
+          if ("options" in lyr && "dataVar" in lyr["options"]){
+            features = this[lyr["options"]["dataVar"]].features.slice(0);
+            try{
+              for (key in Filters){
+                if (Filters[key] == "str" || Filters[key] == "bool"){
+                  var selection = [];
+                  var options = document.getElementById("sel_" + key).options
+                  for (var i=0; i < options.length; i++) {
+                    if (options[i].selected) selection.push(options[i].value);
+                  }
+                    try{
+                      if (key in features[0].properties){
+                        for (i = features.length - 1;
+                          i >= 0; --i){
+                          if (selection.indexOf(
+                          features[i].properties[key])<0
+                          && selection.length>0) {
+                          features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                  }
+                }
+                if (Filters[key] == "int"){
+                  sliderVals =  document.getElementById(
+                    "div_" + key).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (parseInt(features[i].properties[key])
+                          < sliderVals[0]
+                          || parseInt(features[i].properties[key])
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "real"){
+                  sliderVals =  document.getElementById(
+                    "div_" + key).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (features[i].properties[key]
+                          < sliderVals[0]
+                          || features[i].properties[key]
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "date"
+                  || Filters[key] == "datetime"
+                  || Filters[key] == "time"){
+                  try{
+                    if (key in features[0].properties){
+                      HTMLkey = key.replace(/[&\/\\#,+()$~%.'":*?<>{} ]/g, '');
+                      startdate = document.getElementById("dat_" +
+                        HTMLkey + "_date1").value.replace(" ", "T");
+                      enddate = document.getElementById("dat_" +
+                        HTMLkey + "_date2").value.replace(" ", "T");
+                      for (i = features.length - 1; i >= 0; --i){
+                        if (features[i].properties[key] < startdate
+                          || features[i].properties[key] > enddate){
+                          features.splice(i,1);
+                        }
+                      }
+                    }
+                  } catch(err){
+                  }
+                }
+              }
+            } catch(err){
+            }
+          this[lyr["options"]["layerName"]].clearLayers();
+          this[lyr["options"]["layerName"]].addData(features);
+          }
+          })
+        }
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_ZEE = document.createElement('div');
+            div_ZEE.id = "div_ZEE";
+            div_ZEE.className= "filterselect";
+            document.getElementById("menu").appendChild(div_ZEE);
+            sel_ZEE = document.createElement('select');
+            sel_ZEE.multiple = true;
+            sel_ZEE.size = 10;
+            sel_ZEE.id = "sel_ZEE";
+            var ZEE_options_str = "<option value='' unselected></option>";
+            sel_ZEE.onchange = function(){filterFunc()};
+            ZEE_options_str  += '<option value="Centros poblados urbanos">Centros poblados urbanos</option>';
+            ZEE_options_str  += '<option value="Reserva Nacional Pacaya - Samiria">Reserva Nacional Pacaya - Samiria</option>';
+            ZEE_options_str  += '<option value="Zona de expansión urbana e industrial">Zona de expansión urbana e industrial</option>';
+            ZEE_options_str  += '<option value="Zona para cultivo en limpio y producción forestal de calidad agrológica baja a media, con limitaciones por inundación">Zona para cultivo en limpio y producción forestal de calidad agrológica baja a media, con limitaciones por inundación</option>';
+            ZEE_options_str  += '<option value="Zona para cultivo en limpio y protección de calidad agrológica baja, con limitaciones por suelo e inundación">Zona para cultivo en limpio y protección de calidad agrológica baja, con limitaciones por suelo e inundación</option>';
+            ZEE_options_str  += '<option value="Zona para cultivo permanente, pastos y producción forestal de calidad agrológica baja a media con limitaciones por suelo, con potencial forestal maderable y recurso minero no metálico">Zona para cultivo permanente, pastos y producción forestal de calidad agrológica baja a media con limitaciones por suelo, con potencial forestal maderable y recurso minero no metálico</option>';
+            ZEE_options_str  += '<option value="Zona para cultivo permanente, pastos y producción forestal de calidad agrológica baja a media con limitaciones por suelo, con recurso minero no metálico">Zona para cultivo permanente, pastos y producción forestal de calidad agrológica baja a media con limitaciones por suelo, con recurso minero no metálico</option>';
+            ZEE_options_str  += '<option value="Zona para pesca comercial">Zona para pesca comercial</option>';
+            ZEE_options_str  += '<option value="Zona para pesca de subsistencia">Zona para pesca de subsistencia</option>';
+            ZEE_options_str  += '<option value="Zona para pesca de subsistencia con potencial acuícola">Zona para pesca de subsistencia con potencial acuícola</option>';
+            ZEE_options_str  += '<option value="Zona para producción forestal y cultivo permanente de calidad agrológica media a baja con limitaciones por suelo y erosión, con potencial acuícola y forestal maderable">Zona para producción forestal y cultivo permanente de calidad agrológica media a baja con limitaciones por suelo y erosión, con potencial acuícola y forestal maderable</option>';
+            ZEE_options_str  += '<option value="Zona para producción forestal y cultivo permanente de calidad agrológica media a baja con limitaciones por suelo y erosión, con potencial acuícola, forestal maderable y recurso minero no metálico">Zona para producción forestal y cultivo permanente de calidad agrológica media a baja con limitaciones por suelo y erosión, con potencial acuícola, forestal maderable y recurso minero no metálico</option>';
+            ZEE_options_str  += '<option value="Zona para producción forestal y cultivo permanente de calidad agrológica media a baja con limitaciones por suelo y erosión, con potencial forestal maderable">Zona para producción forestal y cultivo permanente de calidad agrológica media a baja con limitaciones por suelo y erosión, con potencial forestal maderable</option>';
+            ZEE_options_str  += '<option value="Zona para producción forestal y cultivo permanente de calidad agrológica media a baja con limitaciones por suelo y erosión, con potencial forestal maderable y recurso minero no metálico">Zona para producción forestal y cultivo permanente de calidad agrológica media a baja con limitaciones por suelo y erosión, con potencial forestal maderable y recurso minero no metálico</option>';
+            ZEE_options_str  += '<option value="Zona para producción forestal y protección de calidad agrológica baja con limitaciones por suelo y drenaje">Zona para producción forestal y protección de calidad agrológica baja con limitaciones por suelo y drenaje</option>';
+            ZEE_options_str  += '<option value="Zona para producción forestal y protección de calidad agrológica baja con limitaciones por suelo y drenaje, con potencial forestal maderable">Zona para producción forestal y protección de calidad agrológica baja con limitaciones por suelo y drenaje, con potencial forestal maderable</option>';
+            ZEE_options_str  += '<option value="Zona para producción forestal y protección de calidad agrológica baja con limitaciones por suelo y drenaje, con potencial forestal maderable y recurso minero no metálico">Zona para producción forestal y protección de calidad agrológica baja con limitaciones por suelo y drenaje, con potencial forestal maderable y recurso minero no metálico</option>';
+            ZEE_options_str  += '<option value="Zona para producción forestal y protección de calidad agrológica baja con limitaciones por suelo y erosión, con potencial forestal maderable">Zona para producción forestal y protección de calidad agrológica baja con limitaciones por suelo y erosión, con potencial forestal maderable</option>';
+            ZEE_options_str  += '<option value="Zona para producción forestal, cultivos permanentes y protección de calidad agrológica baja con limitaciones por suelo y erosión, con potencial acuícola y forestal maderable">Zona para producción forestal, cultivos permanentes y protección de calidad agrológica baja con limitaciones por suelo y erosión, con potencial acuícola y forestal maderable</option>';
+            ZEE_options_str  += '<option value="Zona para producción forestal, cultivos permanentes y protección de calidad agrológica baja con limitaciones por suelo y erosión, con potencial acuícola,  forestal maderable y recurso minero no metálico">Zona para producción forestal, cultivos permanentes y protección de calidad agrológica baja con limitaciones por suelo y erosión, con potencial acuícola,  forestal maderable y recurso minero no metálico</option>';
+            ZEE_options_str  += '<option value="Zona para producción forestal, cultivos permanentes y protección de calidad agrológica baja con limitaciones por suelo y erosión, con potencial forestal maderable">Zona para producción forestal, cultivos permanentes y protección de calidad agrológica baja con limitaciones por suelo y erosión, con potencial forestal maderable</option>';
+            ZEE_options_str  += '<option value="Zona para producción forestal, cultivos permanentes y protección de calidad agrológica media a baja con limitaciones por suelo y drenaje, con potencial forestal maderable">Zona para producción forestal, cultivos permanentes y protección de calidad agrológica media a baja con limitaciones por suelo y drenaje, con potencial forestal maderable</option>';
+            ZEE_options_str  += '<option value="Zona para producción forestal, cultivos permanentes y protección de calidad agrológica media a baja con limitaciones por suelo y drenaje, con potencial forestal maderable y recurso minero no metálico">Zona para producción forestal, cultivos permanentes y protección de calidad agrológica media a baja con limitaciones por suelo y drenaje, con potencial forestal maderable y recurso minero no metálico</option>';
+            ZEE_options_str  += '<option value="Zona para protección con limitaciones por suelo e inundación">Zona para protección con limitaciones por suelo e inundación</option>';
+            ZEE_options_str  += '<option value="Zona para protección con limitaciones por suelo y erosión">Zona para protección con limitaciones por suelo y erosión</option>';
+            ZEE_options_str  += '<option value="Zona para protección con limitaciones por suelo y erosión, con recurso minero no metálico">Zona para protección con limitaciones por suelo y erosión, con recurso minero no metálico</option>';
+            ZEE_options_str  += '<option value="Zona para protección de aguajales densos y mixtos">Zona para protección de aguajales densos y mixtos</option>';
+            ZEE_options_str  += '<option value="Zona para protección de bosques pantanosos">Zona para protección de bosques pantanosos</option>';
+            ZEE_options_str  += '<option value="Zona para protección de bosques y vegetación de esclerófila de arenas blancas (varillales)">Zona para protección de bosques y vegetación de esclerófila de arenas blancas (varillales)</option>';
+            ZEE_options_str  += '<option value="Zona para protección de especies endémicas de flora y fauna">Zona para protección de especies endémicas de flora y fauna</option>';
+            ZEE_options_str  += '<option value="Zona para protección de herbazales pantanosos">Zona para protección de herbazales pantanosos</option>';
+            ZEE_options_str  += '<option value="Zona para protección por recarga hídrica">Zona para protección por recarga hídrica</option>';
+            ZEE_options_str  += '<option value="Zona para protección y producción forestal de calidad agrológica baja con limitaciones por suelo y erosión">Zona para protección y producción forestal de calidad agrológica baja con limitaciones por suelo y erosión</option>';
+            ZEE_options_str  += '<option value="Zona para protección y producción forestal de calidad agrológica baja con limitaciones por suelo y erosión, con potencial forestal maderable">Zona para protección y producción forestal de calidad agrológica baja con limitaciones por suelo y erosión, con potencial forestal maderable</option>';
+            ZEE_options_str  += '<option value="Zona para protección y producción forestal de calidad agrológica baja con limitaciones por suelo y erosión, con potencial forestal maderable y recurso minero no metálico">Zona para protección y producción forestal de calidad agrológica baja con limitaciones por suelo y erosión, con potencial forestal maderable y recurso minero no metálico</option>';
+            ZEE_options_str  += '<option value="Zona para protección, producción forestal y cultivo en limpio de calidad agrológica media a baja con limitaciones por suelo, drenaje e inundación">Zona para protección, producción forestal y cultivo en limpio de calidad agrológica media a baja con limitaciones por suelo, drenaje e inundación</option>';
+            ZEE_options_str  += '<option value="Zona para recuperación por sobre uso">Zona para recuperación por sobre uso</option>';
+            sel_ZEE.innerHTML = ZEE_options_str;
+            div_ZEE.appendChild(sel_ZEE);
+            var lab_ZEE = document.createElement('div');
+            lab_ZEE.innerHTML = 'ZEE';
+            lab_ZEE.className = 'filterlabel';
+            div_ZEE.appendChild(lab_ZEE);
+            var reset_ZEE = document.createElement('div');
+            reset_ZEE.innerHTML = 'clear filter';
+            reset_ZEE.className = 'filterlabel';
+            reset_ZEE.onclick = function() {
+                var options = document.getElementById("sel_ZEE").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_ZEE.appendChild(reset_ZEE);
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_ZONAS_GRAN = document.createElement('div');
+            div_ZONAS_GRAN.id = "div_ZONAS_GRAN";
+            div_ZONAS_GRAN.className= "filterselect";
+            document.getElementById("menu").appendChild(div_ZONAS_GRAN);
+            sel_ZONAS_GRAN = document.createElement('select');
+            sel_ZONAS_GRAN.multiple = true;
+            sel_ZONAS_GRAN.size = 4;
+            sel_ZONAS_GRAN.id = "sel_ZONAS_GRAN";
+            var ZONAS_GRAN_options_str = "<option value='' unselected></option>";
+            sel_ZONAS_GRAN.onchange = function(){filterFunc()};
+            ZONAS_GRAN_options_str  += '<option value="Zona de protección y conservación ecológica">Zona de protección y conservación ecológica</option>';
+            ZONAS_GRAN_options_str  += '<option value="Zona para recuperación">Zona para recuperación</option>';
+            ZONAS_GRAN_options_str  += '<option value="Zona productiva">Zona productiva</option>';
+            ZONAS_GRAN_options_str  += '<option value="Zona urbana e industrial">Zona urbana e industrial</option>';
+            sel_ZONAS_GRAN.innerHTML = ZONAS_GRAN_options_str;
+            div_ZONAS_GRAN.appendChild(sel_ZONAS_GRAN);
+            var lab_ZONAS_GRAN = document.createElement('div');
+            lab_ZONAS_GRAN.innerHTML = 'ZONAS_GRAN';
+            lab_ZONAS_GRAN.className = 'filterlabel';
+            div_ZONAS_GRAN.appendChild(lab_ZONAS_GRAN);
+            var reset_ZONAS_GRAN = document.createElement('div');
+            reset_ZONAS_GRAN.innerHTML = 'clear filter';
+            reset_ZONAS_GRAN.className = 'filterlabel';
+            reset_ZONAS_GRAN.onclick = function() {
+                var options = document.getElementById("sel_ZONAS_GRAN").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_ZONAS_GRAN.appendChild(reset_ZONAS_GRAN);
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_ZONAS = document.createElement('div');
+            div_ZONAS.id = "div_ZONAS";
+            div_ZONAS.className= "filterselect";
+            document.getElementById("menu").appendChild(div_ZONAS);
+            sel_ZONAS = document.createElement('select');
+            sel_ZONAS.multiple = true;
+            sel_ZONAS.size = 6;
+            sel_ZONAS.id = "sel_ZONAS";
+            var ZONAS_options_str = "<option value='' unselected></option>";
+            sel_ZONAS.onchange = function(){filterFunc()};
+            ZONAS_options_str  += '<option value="Zona de protección y conservación ecológica">Zona de protección y conservación ecológica</option>';
+            ZONAS_options_str  += '<option value="Zona de vocación urbana e industrial">Zona de vocación urbana e industrial</option>';
+            ZONAS_options_str  += '<option value="Zona para producción agropecuaria">Zona para producción agropecuaria</option>';
+            ZONAS_options_str  += '<option value="Zona para producción forestal">Zona para producción forestal</option>';
+            ZONAS_options_str  += '<option value="Zona para producción pesquera">Zona para producción pesquera</option>';
+            ZONAS_options_str  += '<option value="Zona para recuperación">Zona para recuperación</option>';
+            sel_ZONAS.innerHTML = ZONAS_options_str;
+            div_ZONAS.appendChild(sel_ZONAS);
+            var lab_ZONAS = document.createElement('div');
+            lab_ZONAS.innerHTML = 'ZONAS';
+            lab_ZONAS.className = 'filterlabel';
+            div_ZONAS.appendChild(lab_ZONAS);
+            var reset_ZONAS = document.createElement('div');
+            reset_ZONAS.innerHTML = 'clear filter';
+            reset_ZONAS.className = 'filterlabel';
+            reset_ZONAS.onclick = function() {
+                var options = document.getElementById("sel_ZONAS").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_ZONAS.appendChild(reset_ZONAS);
+        resetLabels([layer_LIMITEDISTRITAL_4,layer_CENTROSPOBLADOS_5]);
+        map.on("zoomend", function(){
+            resetLabels([layer_LIMITEDISTRITAL_4,layer_CENTROSPOBLADOS_5]);
+        });
+        map.on("layeradd", function(){
+            resetLabels([layer_LIMITEDISTRITAL_4,layer_CENTROSPOBLADOS_5]);
+        });
+        map.on("layerremove", function(){
+            resetLabels([layer_LIMITEDISTRITAL_4,layer_CENTROSPOBLADOS_5]);
+        });
+        </script>
+    </body>
+</html>
