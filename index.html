@@ -459,7 +459,7 @@
         document.getElementById("all").appendChild(col1);
         document.getElementById("all").appendChild(col2);
         col1.appendChild(mapDiv)
-        var Filters = {"Zonas Ecológicas Económicas": "str","Grandes Zonas": "str","Zonas": "str"};
+        var Filters = {"ZEE": "str","ZONAS_GRAN": "str","ZONAS": "str"};
         function filterFunc() {
           map.eachLayer(function(lyr){
           if ("options" in lyr && "dataVar" in lyr["options"]){
@@ -633,7 +633,7 @@
             sel_ZONAS_GRAN.innerHTML = ZONAS_GRAN_options_str;
             div_ZONAS_GRAN.appendChild(sel_ZONAS_GRAN);
             var lab_ZONAS_GRAN = document.createElement('div');
-            lab_ZONAS_GRAN.innerHTML = 'ZONAS_GRAN';
+            lab_ZONAS_GRAN.innerHTML = 'GRANDES ZONAS';
             lab_ZONAS_GRAN.className = 'filterlabel';
             div_ZONAS_GRAN.appendChild(lab_ZONAS_GRAN);
             var reset_ZONAS_GRAN = document.createElement('div');
