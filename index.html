@@ -12,7 +12,7 @@
         <link rel="stylesheet" href="css/MarkerCluster.Default.css">
         <link rel="stylesheet" href="css/leaflet-search.css">
         <link rel="stylesheet" href="css/filter.css">
-<link rel="stylesheet" href="css/nouislider.min.css">
+        <link rel="stylesheet" href="css/nouislider.min.css">
         <link rel="stylesheet" href="css/leaflet-measure.css">
         <style>
         html, body, #map {
@@ -22,11 +22,9 @@
             margin: 0;
         }
         </style>
-        <title></title>
-    </head>
+     </head>
     <body>
         <div id="map">
-            <a target="_blank" href="https://jpalaciosvega.github.io/ZEE_Alto_Amazonas/#8/-4.724/-74.268"><i class="fas fa-fw fa-handshake"></i> MAPA DE ZEE PROVINCIA ALTO AMAZONAS</a>
         </div>
         <script src="js/qgis2web_expressions.js"></script>
         <script src="js/leaflet.js"></script>
@@ -42,8 +40,8 @@
         <script src="js/leaflet.markercluster.js"></script>
         <script src="js/leaflet-search.js"></script>
         <script src="js/tailDT.js"></script>
-<script src="js/nouislider.min.js"></script>
-<script src="js/wNumb.js"></script>
+        <script src="js/nouislider.min.js"></script>
+        <script src="js/wNumb.js"></script>
         <script src="data/GRANDESZONAS_3.js"></script>
         <script src="data/LIMITEDISTRITAL_4.js"></script>
         <script src="data/CENTROSPOBLADOS_5.js"></script>
@@ -76,6 +74,16 @@
             primaryAreaUnit: 'sqmeters',
             secondaryAreaUnit: 'hectares'
         });
+            
+        L.control.logo({
+            position: 'topleft',
+            height: '468px',
+            width: '260px',
+            target: '_blank',
+            link: 'http://www.iiap.gob.pe/Inicio.aspx',
+            image: 'images/iiap.jpg'
+        }).addTo(map);
+         
         measureControl.addTo(map);
         document.getElementsByClassName('leaflet-control-measure-toggle')[0]
         .innerHTML = '';
