@@ -29,7 +29,7 @@
         <title></title>
      </head>
     <body>
-        <h2>ZONIFICACIÓN ECOLÓGICA ECONÓMICA DE LA PROVINCIA ALTO AMAZONAS</h2>
+        <h2>   ZONIFICACIÓN ECOLÓGICA ECONÓMICA DE LA PROVINCIA ALTO AMAZONAS</h2>
         <div id="map">
         </div>
         <script src="js/qgis2web_expressions.js"></script>
@@ -85,7 +85,6 @@
             primaryAreaUnit: 'sqmeters',
             secondaryAreaUnit: 'hectares'
         });
-           
         measureControl.addTo(map);
         document.getElementsByClassName('leaflet-control-measure-toggle')[0]
         .innerHTML = '';
@@ -97,6 +96,15 @@
                 map.fitBounds(bounds_group.getBounds());
             }
         }
+        L.control.logo({
+            position: 'botoomleft',
+            height: '100px',
+            width: '50px',
+            ##target: '_blank',
+            ##link: 'https://www.minagri.gob.pe/portal/inicio',
+            image: 'images/iiap.jpg'
+        }).addTo(map);
+            
         var layer_OpenStreetMap_0 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             opacity: 1.0,
             attribution: '',
