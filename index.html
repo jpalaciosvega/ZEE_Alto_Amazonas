@@ -173,13 +173,6 @@
             layer.bindPopup(popupContent, {maxHeight: 400});
         }
 
-        L.control.logo({
-        position: 'botoomleft',
-            height: '106px',
-            width: '60px',
-            image: 'images/iiap.jpg'
-        }).addTo(map);     
-            
         function style_GRANDESZONAS_3_0(feature) {
             switch(String(feature.properties['ZONAS_GRAN'])) {
                 case 'Zona de protección y conservación ecológica':
