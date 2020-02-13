@@ -114,14 +114,7 @@
             minNativeZoom: 0,
             maxNativeZoom: 19
         });
-       
-        L.control.logo({
-            position: 'botoomleft',
-            height: '106px',
-            width: '60px',
-            image: 'images/iiap.jpg'
-        }).addTo(map);
-         
+      
        layer_OpenStreetMap_0;
         map.addLayer(layer_OpenStreetMap_0);
         var layer_GoogleMaps_1 = L.tileLayer('https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}', {
@@ -180,6 +173,13 @@
             layer.bindPopup(popupContent, {maxHeight: 400});
         }
 
+        L.control.logo({
+        position: 'botoomleft',
+            height: '106px',
+            width: '60px',
+            image: 'images/iiap.jpg'
+        }).addTo(map);     
+            
         function style_GRANDESZONAS_3_0(feature) {
             switch(String(feature.properties['ZONAS_GRAN'])) {
                 case 'Zona de protección y conservación ecológica':
